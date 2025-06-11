@@ -6,11 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
 
-    <!-- Favicon link (add your logo file path) -->
     <link rel="icon" href="assets/Holy Cross Silver.ico" type="image/x-icon">
-    <!-- Replace 'assets/logo.ico' with your actual logo file path -->
 
-    <!-- Google Fonts Link -->
     <link href="https://fonts.google.com/noto/specimen/Noto+Sans+Display?preview.text=misery302&query=ancient"
         rel="stylesheet">
     <style>
@@ -33,10 +30,8 @@
             overflow: hidden;
             position: relative;
             cursor: url('assets/cursor.cur'), auto;
-            /* Custom cursor */
         }
 
-        /* Video Background Styling */
         #backgroundVideo {
             position: fixed;
             top: 0;
@@ -46,14 +41,10 @@
             object-fit: cover;
             z-index: 0;
             display: none;
-            /* Hidden initially */
             background-color: #000000;
             opacity: 0;
-            /* Initially hidden */
             pointer-events: none;
-            /* Prevent interaction with video */
             transition: opacity 2s ease-in-out;
-            /* Fade-in animation */
         }
 
         .profile-container {
@@ -84,7 +75,6 @@
             margin-top: -90px;
             position: relative;
             text-shadow: 1px 1px 20px rgba(0, 0, 0, 1);
-            /* Shadow added here */
             background-image: url(assets/black_particle.gif);
             filter: drop-shadow(#000000 1px 0 7px);
         }
@@ -100,18 +90,14 @@
             width: 40px;
             height: 40px;
             cursor: url('assets/cursor.cur'), auto;
-            /* Custom cursor for icons */
             transition: transform 0.3s ease-in-out;
-            /* Transition for scaling */
             filter: drop-shadow(#000000 1px 0 7px);
         }
 
         .icon:hover {
             transform: scale(1.2);
-            /* Scale the icon by 20% */
         }
 
-        /* Black Overlay */
         .black-overlay {
             position: fixed;
             top: 0;
@@ -125,10 +111,8 @@
             justify-content: center;
             align-items: center;
             cursor: url('assets/cursor.cur'), auto;
-            /* Custom cursor for overlay */
             opacity: 1;
             transition: opacity 2s ease;
-            /* Slow fade-out */
         }
 
         .rain {
@@ -150,22 +134,17 @@
             background: white;
             opacity: 0.5;
             animation: fall linear infinite;
-            /* Make it infinite */
         }
 
         @keyframes fall {
             0% {
                 transform: translateY(0) translateX(0);
-                /* Start at the top */
                 opacity: 0.5;
-                /* Start with full opacity */
             }
 
             100% {
                 transform: translateY(120vh) translateX(calc(-10px + 20px * var(--direction)));
-                /* Fall to the bottom */
                 opacity: 0;
-                /* Fade out as it falls */
             }
         }
     </style>
@@ -173,16 +152,13 @@
 
 <body>
 
-    <!-- Background Video -->
     <video id="backgroundVideo" muted loop autoplay playsinline>
-        <source src="assets/backrgound.webm" type="video/webm">
+        <source src="assets/60garage.mp4" type="video/webm">
         Your browser does not support the video tag.
     </video>
 
-    <!-- Black Blur Overlay -->
     <div class="black-overlay" id="blackOverlay"></div>
 
-    <!-- Profile Container -->
     <div class="profile-container">
         <div class="profile-pic"></div>
         <div class="username" id="username">60</div>
@@ -200,7 +176,6 @@
         </div>
     </div>
 
-    <!-- Rain Effect -->
     <div class="rain" id="rainEffect"></div>
 
     <audio id="backgroundMusic" loop>
@@ -209,7 +184,6 @@
     </audio>
 
     <script>
-        // Generate raindrops with random positions and speeds
         const rainContainer = document.getElementById('rainEffect');
         const raindropCount = 100;
         const maxRaindropDuration = 3;
@@ -218,35 +192,27 @@
             const raindrop = document.createElement('div');
             raindrop.classList.add('raindrop');
 
-            // Set random horizontal position
             raindrop.style.left = Math.random() * 100 + 'vw';
 
-            // Set random animation duration (speed of fall)
-            const duration = 2 + Math.random() * maxRaindropDuration; // Random duration for falling
+            const duration = 2 + Math.random() * maxRaindropDuration;
             raindrop.style.animationDuration = `${duration}s`;
 
-            // Set random animation delay (so that raindrops start at different times)
             raindrop.style.animationDelay = Math.random() * -5 + 's';
 
-            // Random direction to make rain look more natural
             raindrop.style.setProperty('--direction', Math.random() * 2 - 1);
 
-            // Append to rain container
             rainContainer.appendChild(raindrop);
 
-            // Remove the raindrop after its animation ends, to keep the DOM clean
             raindrop.addEventListener('animationiteration', () => {
                 raindrop.remove();
-                createRaindrop();  // Create a new raindrop when one finishes falling
+                createRaindrop();
             });
         }
 
-        // Create initial raindrops and continuously generate more
         for (let i = 0; i < raindropCount; i++) {
             createRaindrop();
         }
 
-        // Play the background music and start video after overlay fade-out
         const blackOverlay = document.getElementById('blackOverlay');
         const music = document.getElementById('backgroundMusic');
         const video = document.getElementById('backgroundVideo');
@@ -255,7 +221,6 @@
             music.volume = 0;
             music.play();
 
-            // Gradually increase music volume
             let volumeIncreaseInterval = setInterval(() => {
                 if (music.volume < 1) {
                     music.volume = Math.min(music.volume + 0.1, 1);
@@ -264,39 +229,34 @@
                 }
             }, 200);
 
-            // Start fading out the overlay and fading in the video at the same time
-            blackOverlay.style.opacity = '0';  // Fade out overlay
-            video.style.display = 'block';  // Show video
-            video.style.opacity = '1';  // Start fading in video
+            blackOverlay.style.opacity = '0';
+            video.style.display = 'block';
+            video.style.opacity = '1';
 
-            // Play the video after the fade-in starts
             video.play();
 
             setTimeout(() => {
-                blackOverlay.style.display = 'none'; // Hide the overlay completely after fade
-            }, 2000); // Ensure the overlay fades out before it's hidden
+                blackOverlay.style.display = 'none';
+            }, 2000);
         });
 
-        // Typing and Deleting Effect for browser title
         const originalTitle = "@60";
-        const deleteSpeed = 300; // Speed for deleting text in milliseconds
-        const typingSpeed = 300; // Speed for typing text in milliseconds
+        const deleteSpeed = 300;
+        const typingSpeed = 300;
 
         let titleIndex = 0;
         let titleDeleteIndex = originalTitle.length;
 
-        // Typing effect function
         function typeTitle() {
             if (titleIndex < originalTitle.length) {
                 document.title += originalTitle.charAt(titleIndex);
                 titleIndex++;
                 setTimeout(typeTitle, typingSpeed);
             } else {
-                setTimeout(deleteTitle, 0); // Start deleting after typing
+                setTimeout(deleteTitle, 0);
             }
         }
 
-        // Deleting effect function
         function deleteTitle() {
             if (titleDeleteIndex >= 1) {
                 document.title = document.title.slice(0, titleDeleteIndex);
@@ -305,14 +265,13 @@
             } else {
                 titleIndex = 1;
                 titleDeleteIndex = originalTitle.length;
-                setTimeout(typeTitle, 0); // Start typing again after deleting
+                setTimeout(typeTitle, 0);
             }
         }
 
-        // Start the typing effect when the page loads
         window.onload = () => {
             typeTitle();
-            video.style.display = 'none';  // Hide video initially
+            video.style.display = 'none';
         };
 
     </script>
